@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment              # Type of kubernetes resource
+metadata:
+  name: secured-chat-server
+  labels:
+    app: secured-chat-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:              # The deployment applies to any pods mayching the specified labels
+      app: secured-chat-server
+  template:                   # Template for creating the pods in this deployment
+    metadata:
+      labels:
+        app: secured-chat-server
+    spec:                     # Spec for the containers that will be run in the Pods
+      containers:
+      - name: secured-chat-server
+        image: marvastsi/websocket-secured-chat:1.0.0-SNAPSHOT
+        imagePullPolicy: IfNotPresent
+        ports:
+          - name: http
+            containerPort: 80
+---
+apiVersion: v1
+kind: Service                 # Type of the kubernetes resource
+metadata:                     
+  name: secured-chat-server
+  labels:
+    app: secured-chat-server
+spec:
+  type: NodePort              # The service will be exposed by opening a Port on each node and proxying it. 
+  selector:
+    app: secured-chat-server  # The service exposes Pods with label `app=polling-app-server`
+  ports:                      # Forward incoming connections on port 80 to the target port 80
+  - name: http
+    port: 80
+    targetPort: 80
