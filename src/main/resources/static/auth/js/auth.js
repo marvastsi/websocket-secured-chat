@@ -15,8 +15,8 @@ var colors = [ "#2196F3", "#32C787", "#00BCD4", "#FF5652", "#FFC107",
 		"#FF85AF", "#FF9800", "#39BBB0" ];
 
 var auth = {};
-auth["06059542913"] = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIwNjA1OTU0MjkxMyIsImV4cCI6MTU4NDcwNDA2NSwiaWF0IjoxNTg0NjE3NjY1fQ.tNBoTEzLGISlggMJPO43qqNr7bXSP-7YfpNv2_vZeAT9spl_2cQpY52w8hQijDOXQdGhNRX_KOkXWLTIohioeQ";
-auth["06327912923"] = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIwNjMyNzkxMjkyMyIsImV4cCI6MTU4NDcwNDEwOSwiaWF0IjoxNTg0NjE3NzA5fQ.YA2qnJMBcK7mG1YGxJ3m7UqHKvZ0JWkhHcQq4RDT8skzgduxN4Q2tkjY68A99Ac71X0HV3RUwJ-cA6wYee8EZQ";
+// This token was given by calling user.authenticate on api
+auth["30774575042"] = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIwNjA1OTU0MjkxMyIsImV4cCI6MTU4NDcwNDA2NSwiaWF0IjoxNTg0NjE3NjY1fQ.tNBoTEzLGISlggMJPO43qqNr7bXSP-7YfpNv2_vZeAT9spl_2cQpY52w8hQijDOXQdGhNRX_KOkXWLTIohioeQ";
 
 function connect(event) {
 	username = document.querySelector("#username").value.trim();
