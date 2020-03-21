@@ -16,7 +16,7 @@ var colors = [ "#2196F3", "#32C787", "#00BCD4", "#FF5652", "#FFC107",
 
 var auth = {};
 // This token was given by calling user.authenticate on api
-auth["30774575042"] = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIwNjA1OTU0MjkxMyIsImV4cCI6MTU4NDcwNDA2NSwiaWF0IjoxNTg0NjE3NjY1fQ.tNBoTEzLGISlggMJPO43qqNr7bXSP-7YfpNv2_vZeAT9spl_2cQpY52w8hQijDOXQdGhNRX_KOkXWLTIohioeQ";
+auth["30774575042"] = "token_value";
 
 function connect(event) {
 	username = document.querySelector("#username").value.trim();
