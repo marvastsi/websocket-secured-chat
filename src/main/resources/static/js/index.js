@@ -6,7 +6,7 @@ var loginForm = document.querySelector("#loginForm");
 var messageForm = document.querySelector("#messageForm");
 var messageInput = document.querySelector("#message");
 var messageContainer = document.querySelector("#messageContainer");
-var connectingElement = document.querySelector(".connecting");
+var connectingElement = document.querySelector("#connecting");
 
 var stompClient = null;
 var username = null;
@@ -14,18 +14,22 @@ var username = null;
 var colors = [ "#2196F3", "#32C787", "#00BCD4", "#FF5652", "#FFC107",
 		"#FF85AF", "#FF9800", "#39BBB0" ];
 
-var auth = { accessToken:  "" };
+var auth = {
+	accessToken : ""
+};
 
 function connect(event) {
 	username = document.querySelector("#username").value.trim();
 
 	if (username) {
-//		loginPage.classList.add("hidden");
+		loginPage.classList.add("hidden");
 		connectingElement.classList.remove("hidden");
 		chatPage.classList.remove("hidden");
 
+		// Bind server
 		var socket = new SockJS("/api/ws");
 		stompClient = Stomp.over(socket);
+		// Try connect to the server
 		stompClient.connect({}, onConnected, onError);
 	}
 	event.preventDefault();
@@ -48,7 +52,7 @@ function onConnected() {
 
 function onError(error) {
 	connectingElement.textContent = "Could not connect to the WebSocket server. Try refresh this page."
-		+ error;
+			+ error;
 	connectingElement.style.color = "#F00";
 }
 
@@ -62,10 +66,12 @@ function sendMessage(event) {
 			type : "CHAT"
 		};
 
-		stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
-		
-//		var aChannel = "general";
-//		stompClient.send(`/app/chat.sendMessage/${aChannel}`, {}, JSON.stringify(chatMessage));
+		stompClient.send("/app/chat.sendMessage", {}, JSON
+				.stringify(chatMessage));
+
+		// var aChannel = "general";
+		// stompClient.send(`/app/chat.sendMessage/${aChannel}`, {},
+		// JSON.stringify(chatMessage));
 		messageInput.value = "";
 	}
 	event.preventDefault();
@@ -76,14 +82,17 @@ function onMessageReceived(payload) {
 
 	var messageListElement = document.createElement("li");
 
-	if (message.type === "JOIN") {
+	switch (message.type) {
+	case "JOIN":
 		messageListElement.classList.add("event-message");
 		console.log(message);
 		message.content = message.sender + " joined!";
-	} else if (message.type === "LEAVE") {
+		break;
+	case "LEAVE":
 		messageListElement.classList.add("event-message");
 		message.content = message.sender + " left!";
-	} else {
+		break;
+	default:
 		messageListElement.classList.add("chat-message");
 
 		var avatarElement = document.createElement("i");
