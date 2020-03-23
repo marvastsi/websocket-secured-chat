@@ -50,9 +50,12 @@ public class WebSocketAuthenticationConfig implements WebSocketMessageBrokerConf
 				StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 				if (StompCommand.CONNECT.equals(accessor.getCommand())) {
 					try {
-						List<String> authorization = accessor.getNativeHeader("X-Authorization");
-						String accessToken = authorization.get(0).split(" ")[1];
+						List<String> authorizations = accessor.getNativeHeader("X-Authorization");
+						String bearer = authorizations.get(0);
+						String split[] = bearer != null ? bearer.split(" ") : new String[0];
+						String accessToken = split.length == 2 ? split[1] : null;
 						Assert.notNull(accessToken, "Authorization must not be null");
+						
 						Optional<Claims> jwt = jwtAuthenticator.decode(Optional.of(accessToken));
 						Authentication authentication = performAuthentication(jwt.get());
 						accessor.setUser(authentication);

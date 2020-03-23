@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import com.marvastsi.securedwebsocketchat.api.DTO.LoginDTO;
 import com.marvastsi.securedwebsocketchat.api.model.Token;
 import com.marvastsi.securedwebsocketchat.api.model.User;
+import com.marvastsi.securedwebsocketchat.api.repository.UserRepository;
 import com.marvastsi.securedwebsocketchat.auth.JwtAuthenticator;
 import com.marvastsi.securedwebsocketchat.auth.UnauthorizedException;
 import com.marvastsi.securedwebsocketchat.auth.role.UserRole;
-import com.marvastsi.securedwebsocketchat.repository.UserRepository;
 
 @Service
 @Transactional
@@ -32,7 +32,7 @@ public class UserService {
 
 	public Optional<Token> authenticate(LoginDTO login) {
 		String username = login.getLogin();
-		Optional<User> optUser = userRepository.findByCpf(username);
+		Optional<User> optUser = this.findByUsername(username);
 		if (optUser.isEmpty()) {
 			throw new EntityNotFoundException("Not found user: " + login.getLogin());
 		}
@@ -62,7 +62,8 @@ public class UserService {
 	}
 
 	public Optional<User> findByUsername(String username) {
-		return userRepository.findByCpf(username);
+		String normalized = removeMask(username);
+		return userRepository.findByCpf(normalized);
 	}
 
 	private String removeMask(String value) {

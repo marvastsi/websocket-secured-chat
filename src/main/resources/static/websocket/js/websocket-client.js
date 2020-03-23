@@ -5,6 +5,7 @@ var chatPage = document.querySelector("#chatPage");
 var loginForm = document.querySelector("#loginForm");
 var messageForm = document.querySelector("#messageForm");
 var messageInput = document.querySelector("#message");
+var recipientInput = document.querySelector("#recipient");
 var messageContainer = document.querySelector("#messageContainer");
 var connectingElement = document.querySelector("#connecting");
 
@@ -15,11 +16,10 @@ var colors = [ "#2196F3", "#32C787", "#00BCD4", "#FF5652", "#FFC107",
 		"#FF85AF", "#FF9800", "#39BBB0" ];
 
 var auth = {};
-// This token was given by calling user.authenticate on api
-auth["30774575042"] = "token_value";
 
 function connect(event) {
 	username = document.querySelector("#username").value.trim();
+	auth[username] = document.querySelector("#authtoken").value.trim();
 
 	if (username) {
 		loginPage.classList.add("hidden");
@@ -36,6 +36,9 @@ function connect(event) {
 		stompClient.connect({
 			"X-Authorization" : `Bearer ${authToken}`
 		}, onConnected, onError);
+		
+//		// Try connect to the server without authentication
+//		stompClient.connect({}, onConnected, onError);
 	}
 	event.preventDefault();
 }
@@ -46,8 +49,8 @@ function onConnected() {
 	// Subscribe to the authenticated user channel
 	stompClient.subscribe(`/channel/${username}`, onMessageReceived);
 
-	// Send message to the actual authenticated user
-	stompClient.send(`/app/chat.addUser/${username}`, {}, JSON.stringify({
+	// Send message to the public channel
+	stompClient.send(`/app/chat.sendMessage`, {}, JSON.stringify({
 		sender : username,
 		type : "JOIN"
 	}))
@@ -63,21 +66,20 @@ function onError(error) {
 
 function sendMessage(event) {
 	var messageContent = messageInput.value.trim();
+	var recipient = recipientInput.value.trim();
 
 	if (messageContent && stompClient) {
 		var chatMessage = {
-			sender : username,
 			content : messageInput.value,
 			type : "CHAT"
 		};
 
+		let destination = recipient ? `/app/chat.sendMessage/${recipient}` : "/app/chat.sendMessage";  
 		stompClient.send("/app/chat.sendMessage", {}, JSON
 				.stringify(chatMessage));
 
-		// var aChannel = "general";
-		// stompClient.send(`/app/chat.sendMessage/${aChannel}`, {},
-		// JSON.stringify(chatMessage));
 		messageInput.value = "";
+		recipientInput.value = "";
 	}
 	event.preventDefault();
 }

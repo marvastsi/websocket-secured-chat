@@ -1,71 +1,72 @@
 package com.marvastsi.securedwebsocketchat.socket.controller;
 
-import static java.lang.String.format;
+import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
-import com.marvastsi.securedwebsocketchat.socket.model.ChatMessage;
-import com.marvastsi.securedwebsocketchat.socket.model.ChatMessage.MessageType;
+import com.marvastsi.securedwebsocketchat.api.model.Message;
+import com.marvastsi.securedwebsocketchat.api.model.User;
+import com.marvastsi.securedwebsocketchat.api.service.MessageService;
+import com.marvastsi.securedwebsocketchat.api.service.UserService;
+import com.marvastsi.securedwebsocketchat.socket.DTO.InputMessageDTO;
+import com.marvastsi.securedwebsocketchat.socket.DTO.OutputMessageDTO;
 
 @Controller
 public class ChatController {
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
+
 	@Autowired
-	private SimpMessageSendingOperations messagingTemplate;
+	private MessageService messageService;
+
+	@Autowired
+	private UserService userService;
 
 	/**
 	 * Send broadcast message.
-	 * @param chatMessage
+	 * 
+	 * @param inputMessage
 	 * @return
 	 */
 	@MessageMapping("/chat.sendMessage")
 	@SendTo("/channel/public")
-	public ChatMessage sendBroadcastMessage(@Payload ChatMessage chatMessage) {
-		System.out.println("chat.sendMessage: " + chatMessage);
-		return chatMessage;
+	public OutputMessageDTO sendBroadcastMessage(@Payload InputMessageDTO inputMessage,
+			SimpMessageHeaderAccessor headerAccessor) {
+
+		User sender = (User) ((Authentication) headerAccessor.getUser()).getPrincipal();
+		Message msg = messageService.save(inputMessage, sender, null);
+
+		logger.debug("chat.sendMessage: " + inputMessage);
+		return new OutputMessageDTO(msg);
 	}
 
 	/**
 	 * Sends a message to the specified room
+	 * 
 	 * @param roomId
-	 * @param chatMessage
+	 * @param inputMessage
 	 * @return
 	 */
 	@MessageMapping("/chat.sendMessage/{roomId}")
 	@SendTo("/channel/{roomId}")
-	public ChatMessage sendMessageToRoom(@DestinationVariable String roomId, @Payload ChatMessage chatMessage) {
-		System.out.println("/chat.sendMessage/{roomId}: " + chatMessage);
-		return chatMessage;
-	}
-	
-	/**
-	 * Used to join an user without authentication
-	 * @param roomId
-	 * @param chatMessage
-	 * @param headerAccessor
-	 * @return
-	 */
-	@MessageMapping("/chat.addUser/{roomId}")
-	@SendTo("/channel/{roomId}")
-	public ChatMessage addUser(@DestinationVariable String roomId, @Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
-		String currentRoomId = (String) headerAccessor.getSessionAttributes().put("room_id", roomId);
-		if (currentRoomId != null) {
-			ChatMessage leaveMessage = new ChatMessage();
-			leaveMessage.setType(MessageType.LEAVE);
-			leaveMessage.setSender(chatMessage.getSender());
-			messagingTemplate.convertAndSend(format("/channel/%s", currentRoomId), leaveMessage);
-			System.out.println("/chat.sendMessage/{roomId} LEAVE: " + leaveMessage);
-		}
-		headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
-		System.out.println("/chat.sendMessage/{roomId}: " + chatMessage);
-		return chatMessage;
+	public OutputMessageDTO sendMessageToRoom(@DestinationVariable String roomId, @Payload InputMessageDTO inputMessage,
+			SimpMessageHeaderAccessor headerAccessor) {
+
+		Optional<User> optUser = userService.findByUsername(roomId);
+		User sender = (User) ((Authentication) headerAccessor.getUser()).getPrincipal();
+		Message msg = messageService.save(inputMessage, sender, optUser.get());
+
+		logger.debug("/chat.sendMessage/{roomId}: " + msg);
+		return new OutputMessageDTO(msg);
 	}
 
 }

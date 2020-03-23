@@ -1,6 +1,7 @@
 package com.marvastsi.securedwebsocketchat.auth;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
@@ -36,7 +37,8 @@ public class AuthFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 
 		String header = req.getHeader("X-Authorization");
-		String token = header != null ? header.split(" ")[1] : null;
+		String split[] = header != null ? header.split(" ") : new String[0];
+		String token = split.length == 2 ? split[1] : null;
 
 		if (!StringUtils.isBlank(token)) {
 			Optional<Claims> optClaims = jwtAuthenticator.decode(Optional.of(token));

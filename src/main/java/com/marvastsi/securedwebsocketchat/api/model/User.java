@@ -31,6 +31,7 @@ public class User extends UserAuth {
 
 	private String name;
 
+	@Override
 	protected String getUsernameAuth() {
 		return this.getCpf();
 	}

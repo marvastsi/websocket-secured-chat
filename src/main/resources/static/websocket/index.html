@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 <title>Secured WebSocket Chat</title>
-<link rel="stylesheet" href="./css/auth.css" />
+<link rel="stylesheet" href="./css/index.css" />
 </head>
 <body>
 	<noscript>
 		<h2>Sorry! Browser does not support JavaScript. Try enable it.</h2>
 	</noscript>
-
 	<div id="main">
 		<div id="loginPage">
 			<div class="login-container">
@@ -17,6 +17,8 @@
 					<div class="form-group">
 						<input type="text" title="Enter your username" id="username"
 							placeholder="Username" autocomplete="off" class="form-control" />
+						<input type="text" title="Enter your token" id="authtoken"
+							placeholder="Auth-token" autocomplete="off" class="form-control" />
 					</div>
 					<div class="form-group">
 						<button type="submit" class="join login-submit">Join Chat</button>
@@ -25,20 +27,22 @@
 			</div>
 		</div>
 
-		<div id="chatPage">
+		<div id="chatPage" class="hidden">
 			<div class="chat-container">
 				<div class="chat-header">
-					<h2>[Authenticated] SpringBoot WebSocket Chat</h2>
+					<h2>:: [Authenticated] SpringBoot WebSocket Chat ::</h2>
 				</div>
 				<div id="connecting" class="hidden">Connecting...</div>
 				<ul id="messageContainer">
-
 				</ul>
+				
 				<form id="messageForm" name="messageForm">
 					<div class="form-group">
 						<div class="input-group clearfix">
 							<input type="text" id="message" placeholder="Type a message..."
-								autocomplete="off" class="form-control" />
+								autocomplete="off" class="form-control" /> <input type="text"
+								id="recipient" placeholder="Type a contact" autocomplete="off"
+								class="form-control" />
 							<button type="submit" class="primary">Send</button>
 						</div>
 					</div>
@@ -47,8 +51,10 @@
 		</div>
 	</div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-	<script src="./js/auth.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+	<script src="./js/websocket-client.js"></script>
 </body>
 </html>

@@ -27,7 +27,7 @@ body:before {
 	position: absolute;
 	top: 0;
 	left: 0;
-	background: #FF0404;
+	background: rgba(53, 53, 53, 1);
 	content: "";
 	z-index: 0;
 }
@@ -55,6 +55,7 @@ body:before {
 
 input {
 	padding-left: 10px;
+	margin-top: 5px;
 	outline: none;
 }
 
@@ -106,11 +107,11 @@ button.join {
 
 #loginPage {
 	text-align: center;
-	position: relative;
-	left: 20px;
-	top: 250px;
-	width: 450px;
-	float: left;
+/* 	position: relative; */
+/* 	left: 20px; */
+/* 	top: 250px; */
+/* 	width: 450px; */
+/* 	float: left; */
 }
 
 .login-container {
@@ -123,7 +124,7 @@ button.join {
 	margin-top: 42px;
 	vertical-align: middle;
 	padding: 45px 55px 45px;
-	min-height: 200px;
+	min-height: 250px;
 	position: absolute;
 	top: 50%;
 	left: 0;
@@ -139,9 +140,9 @@ button.join {
 #chatPage {
 	position: relative;
 	height: 100%;
-	float: left;
 	width: 100%;
-	margin-left: 500px
+	margin: 0 auto;
+	margin-top: 50px;
 }
 
 .chat-container {
@@ -154,6 +155,7 @@ button.join {
 	max-height: 600px;
 	min-height: 350px;
 	position: relative;
+	margin: 0 auto;
 }
 
 #chatPage ul {
@@ -164,6 +166,7 @@ button.join {
 	overflow-y: scroll;
 	padding: 0 20px 0px 20px;
 	height: calc(100% - 150px);
+	max-height: 450px;
 }
 
 #chatPage #messageForm {
@@ -218,28 +221,22 @@ button.join {
 #chatPage .chat-message span {
 	color: #333;
 	font-weight: 600;
+	margin-left: 20px;
 }
 
 #chatPage .chat-message p {
 	color: #43464b;
-}
-
-#messageForm .input-group input {
-	float: left;
-	width: calc(100% - 85px);
-}
-
-#messageForm .input-group button {
-	float: left;
-	width: 80px;
-	height: 38px;
-	margin-left: 5px;
+	margin-left: 20px;
 }
 
 .chat-header {
 	text-align: center;
 	padding: 15px;
 	border-bottom: 1px solid #ececec;
+	-webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-size: 1.1em;
 }
 
 .chat-header h2 {
@@ -254,4 +251,63 @@ button.join {
 	position: absolute;
 	top: 65px;
 	width: 100%;
+}
+
+#messageForm .input-group input {
+	float: left;
+	width: calc(100% - 85px);
+}
+
+#messageForm .input-group button {
+	float: left;
+	width: 80px;
+	height: 38px;
+	margin-left: 5px;
+}
+
+
+@media screen and (max-width: 730px) {
+
+    .chat-container {
+        margin-left: 10px;
+        margin-right: 10px;
+        margin-top: 10px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .chat-container {
+        height: calc(100% - 30px);
+    }
+
+    .username-page-container {
+        width: auto;
+        margin-left: 15px;
+        margin-right: 15px;
+        padding: 25px;
+    }
+
+    #chat-page ul {
+        height: calc(100% - 120px);
+    }
+
+    #messageForm .input-group button {
+        width: 65px;
+    }
+
+    #messageForm .input-group input {
+        width: calc(100% - 70px);
+    }
+
+    .chat-header {
+        padding: 10px;
+    }
+
+    .connecting {
+        top: 60px;
+    }
+
+    .chat-header h2 {
+        font-size: 1.1em;
+    }
 }

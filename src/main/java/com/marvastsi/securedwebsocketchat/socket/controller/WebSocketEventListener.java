@@ -1,6 +1,7 @@
 package com.marvastsi.securedwebsocketchat.socket.controller;
 
-import static java.lang.String.format;
+import java.security.Principal;
+import java.util.Optional;
 
 //import java.security.Principal;
 
@@ -14,48 +15,50 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import com.marvastsi.securedwebsocketchat.socket.model.ChatMessage;
+import com.marvastsi.securedwebsocketchat.api.model.Message;
+import com.marvastsi.securedwebsocketchat.api.model.User;
+import com.marvastsi.securedwebsocketchat.api.service.UserService;
 
 @Component
 public class WebSocketEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketEventListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(WebSocketEventListener.class);
 
-    @Autowired
-    private SimpMessageSendingOperations messagingTemplate;
+	@Autowired
+	private UserService userService;
 
-    @EventListener
-    public void handleWebSocketConnectListener(SessionConnectedEvent event) {
-        logger.info("Received a new socket connection.");
-    }
+	@Autowired
+	private SimpMessageSendingOperations messagingTemplate;
 
-    @EventListener
-    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+	@EventListener
+	public void handleWebSocketConnectListener(SessionConnectedEvent event) {
+		Principal user = event.getUser();
+		logger.info("Received a new socket connection for user: " + user != null ? user.getName() : null);
+	}
 
-        // TODO Change this to handle SecurityContext instead HttpSession
-        String username = (String) headerAccessor.getSessionAttributes().get("username");
-        String roomId = (String) headerAccessor.getSessionAttributes().get("room_id");
-        if(username != null) {
-            logger.info("User disconnected: " + username);
+	@EventListener
+	public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+		StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+		Principal user = headerAccessor.getUser();
 
-            ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setType(ChatMessage.MessageType.LEAVE);
-            chatMessage.setSender(username);
+		if (user != null) {
+			String username = user.getName();
+			try {
+				logger.debug("Usuário desconectado: " + username);
+				Optional<User> optUser = userService.findByUsername(username);
 
-            messagingTemplate.convertAndSend(format("/channel/%s", roomId), chatMessage);
-//            messagingTemplate.convertAndSend("/channel/public", chatMessage);
-        }
-        
-//        Principal principal = headerAccessor.getUser();
-//        if(principal != null) {
-//            String username = principal.getName();
-//            logger.info("User disconnected: " + username);
-//
-//            ChatMessage chatMessage = new ChatMessage();
-//            chatMessage.setType(ChatMessage.MessageType.LEAVE);
-//            chatMessage.setSender(username);
-//            messagingTemplate.convertAndSendToUser(principal, format("/channel/%s", roomId), chatMessage);
-//        }
-    }
+				Message chatMessage = new Message();
+				chatMessage.setType(Message.MessageType.LEAVE);
+				chatMessage.setSender(optUser.get());
+				chatMessage.setRecipient(optUser.get());
+
+				messagingTemplate.convertAndSend(String.format("/channel/%s", username), chatMessage);
+				messagingTemplate.convertAndSend("/channel/public", chatMessage);
+			} catch (Exception e) {
+				logger.error("Erro ao desconectar o usuário: " + username + " da sala: " + username + ".\n"
+						+ e.getMessage());
+				e.printStackTrace();
+			}
+		}
+	}
 }

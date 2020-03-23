@@ -1,4 +1,4 @@
-package com.marvastsi.securedwebsocketchat.repository;
+package com.marvastsi.securedwebsocketchat.api.repository;
 
 import java.util.Optional;
 

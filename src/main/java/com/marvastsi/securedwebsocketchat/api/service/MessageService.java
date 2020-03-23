@@ -1,26 +1,29 @@
 package com.marvastsi.securedwebsocketchat.api.service;
 
-import static java.lang.String.format;
-
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
-import com.marvastsi.securedwebsocketchat.socket.model.ChatMessage;
+import com.marvastsi.securedwebsocketchat.api.model.Message;
+import com.marvastsi.securedwebsocketchat.api.model.User;
+import com.marvastsi.securedwebsocketchat.api.repository.MessageRepository;
+import com.marvastsi.securedwebsocketchat.socket.DTO.InputMessageDTO;
 
 @Service
 @Transactional
 public class MessageService {
 
 	@Autowired
-	private SimpMessageSendingOperations messagingTemplate;
+	private MessageRepository messageRepository;
 
-	public void sendMessage(ChatMessage message) {
-		messagingTemplate.convertAndSend(format("/channel/%s", message.getSender()), message);
-		
-		System.out.println(message);
+	public Message save(InputMessageDTO dto, User sender, User recipient) {
+		Message msg = new Message();
+		msg.setContent(dto.getContent());
+		msg.setType(dto.getType());
+		msg.setSender(sender);
+		msg.setRecipient(recipient);
+		return messageRepository.save(msg);
 	}
 
 }
